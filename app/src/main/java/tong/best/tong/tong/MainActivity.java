@@ -1,5 +1,6 @@
 package tong.best.tong.tong;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -12,6 +13,8 @@ import android.os.Bundle;
 import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.AuthFailureError;
@@ -24,16 +27,20 @@ import com.android.volley.toolbox.Volley;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import tong.best.tong.tong.util.GetImageThumbnail;
+
 public class MainActivity extends AppCompatActivity {
 
-    Button button;
-    String encoded_string, image_name;
-    Bitmap bitmap;
-    File file;
-    Uri file_uri;
+    private ImageView imageView;
+    private Button button;
+    private String encoded_string, image_name;
+    private Bitmap bitmap;
+    private File file;
+    private Uri file_uri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +48,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         button = (Button) findViewById(R.id.start);
-
+        imageView = (ImageView) findViewById(R.id.Myimage);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -54,22 +61,39 @@ public class MainActivity extends AppCompatActivity {
    }
 
     private void getFileUri(){
-        image_name = "testing123.jpg";
+        image_name = "testing13.jpg";
         file = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
         + File.separator + image_name);
 
         file_uri = Uri.fromFile(file);
+        imageView.setTag(file);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 
         if (requestCode == 10 && resultCode == RESULT_OK){
+            Bitmap bitmap = null;
+            try {
+                GetImageThumbnail getImageThumbnail = new GetImageThumbnail();
+                bitmap = getImageThumbnail.getThumbnail(file_uri,this);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            imageView.setImageBitmap(bitmap);
             new Encode_image().execute();
         }
     }
 
     private class Encode_image extends AsyncTask<Void,Void,Void>{
+
+//        @Override
+//        protected void onPreExecute() {
+//            progressBar =  ProgressDialog.show(getApplicationContext(), "dialog title",
+//                    "dialog message", true);
+//            progressBar.show();
+//
+//        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -80,7 +104,6 @@ public class MainActivity extends AppCompatActivity {
 
             byte[] array = stream.toByteArray();
             encoded_string = Base64.encodeToString(array,0);
-            bitmap.recycle();
 
             return null;
         }
@@ -118,5 +141,10 @@ public class MainActivity extends AppCompatActivity {
 
             requestQueue.add(request);
         }
+    }
+
+    @Override
+    protected void onResume() {
+        bitmap = null;
     }
 }

@@ -10,6 +10,11 @@
     android:gravity="center"
     tools:context=".MainActivity">
 
+    <ImageView
+        android:id="@+id/Myimage"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
         android:text="Take a pic"
         android:id="@+id/start"
