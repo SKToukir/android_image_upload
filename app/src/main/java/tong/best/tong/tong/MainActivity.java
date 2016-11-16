@@ -41,12 +41,14 @@ public class MainActivity extends AppCompatActivity {
     private Bitmap bitmap;
     private File file;
     private Uri file_uri;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
         button = (Button) findViewById(R.id.start);
         imageView = (ImageView) findViewById(R.id.Myimage);
         button.setOnClickListener(new View.OnClickListener() {
@@ -80,7 +82,9 @@ public class MainActivity extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+
             imageView.setImageBitmap(bitmap);
+            progressBar.setVisibility(View.VISIBLE);
             new Encode_image().execute();
         }
     }
@@ -100,7 +104,7 @@ public class MainActivity extends AppCompatActivity {
 
             bitmap = BitmapFactory.decodeFile(file_uri.getPath());
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG,100,stream);
+            bitmap.compress(Bitmap.CompressFormat.PNG,100,stream);
 
             byte[] array = stream.toByteArray();
             encoded_string = Base64.encodeToString(array,0);
@@ -115,13 +119,13 @@ public class MainActivity extends AppCompatActivity {
 
         private void makeRequest(){
             RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
-            StringRequest request = new StringRequest(Request.Method.POST, "http://10.42.0.1/tong/upload.php",
+            StringRequest request = new StringRequest(Request.Method.POST, "http://www.dogmatt.com/Project21/upload.php",
                     new Response.Listener<String>() {
                         @Override
                         public void onResponse(String response) {
 
                             Toast.makeText(getApplicationContext(),"Android Tutorial "+ response,Toast.LENGTH_LONG).show();
-
+                            progressBar.setVisibility(View.INVISIBLE);
                         }
                     }, new Response.ErrorListener() {
                 @Override
@@ -132,8 +136,8 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 protected Map<String, String> getParams() throws AuthFailureError {
                     HashMap<String, String> map = new HashMap<>();
-                    map.put("encoded_string",encoded_string);
-                    map.put("image_name",image_name);
+                    map.put("photo",encoded_string);
+                    map.put("name",image_name);
 
                     return map;
                 }
@@ -141,10 +145,5 @@ public class MainActivity extends AppCompatActivity {
 
             requestQueue.add(request);
         }
-    }
-
-    @Override
-    protected void onResume() {
-        bitmap = null;
     }
 }

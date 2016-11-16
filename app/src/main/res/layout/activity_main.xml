@@ -13,12 +13,17 @@
     <ImageView
         android:id="@+id/Myimage"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="250dp" />
 
     <Button
         android:text="Take a pic"
         android:id="@+id/start"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <ProgressBar
+        android:visibility="gone"
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
 </LinearLayout>
